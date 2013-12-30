@@ -1,0 +1,175 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        #parent{
+            width:100%;
+            line-height:30px;
+            background-color:lightgray;
+            text-align: center;
+            vertical-align: middle;
+        }
+        #buttonwrapper{
+            background-color: black;
+        }
+        #imgwrapper{
+            border:1px solid black;
+            text-align: center;
+        }
+        #imgbox{
+            border:1px solid red;
+            margin-bottom:10px;
+            margin-top:10px;
+        }
+
+        #searchContent{
+            height:500px;
+            border:1px solid black;
+            text-align:center;
+            background-color: yellow;
+
+        }
+
+    </style>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script>
+            jQuery.fn.rotate = function(angle,whence) {
+            var p = this.get(0);
+
+            // we store the angle inside the image tag for persistence
+            if (!whence) {
+                p.angle = ((p.angle==undefined?0:p.angle) + angle) % 360;
+            } else {
+                p.angle = angle;
+            }
+
+            if (p.angle >= 0) {
+                var rotation = Math.PI * p.angle / 180;
+            } else {
+                var rotation = Math.PI * (360+p.angle) / 180;
+            }
+            var costheta = Math.cos(rotation);
+            var sintheta = Math.sin(rotation);
+
+            if (document.all && !window.opera) {
+                var canvas = document.createElement('img');
+
+                canvas.src = p.src;
+                canvas.height = p.height;
+                canvas.width = p.width;
+
+                canvas.style.filter = "progid:DXImageTransform.Microsoft.Matrix(M11="+costheta+",M12="+(-sintheta)+",M21="+sintheta+",M22="+costheta+",SizingMethod='auto expand')";
+            } else {
+                var canvas = document.createElement('canvas');
+                if (!p.oImage) {
+                    canvas.oImage = new Image();
+                    canvas.oImage.src = p.src;
+                } else {
+                    canvas.oImage = p.oImage;
+                }
+
+                canvas.style.width = canvas.width = Math.abs(costheta*canvas.oImage.width) + Math.abs(sintheta*canvas.oImage.height);
+                canvas.style.height = canvas.height = Math.abs(costheta*canvas.oImage.height) + Math.abs(sintheta*canvas.oImage.width);
+
+                var context = canvas.getContext('2d');
+                context.save();
+                if (rotation <= Math.PI/2) {
+                    context.translate(sintheta*canvas.oImage.height,0);
+                } else if (rotation <= Math.PI) {
+                    context.translate(canvas.width,-costheta*canvas.oImage.height);
+                } else if (rotation <= 1.5*Math.PI) {
+                    context.translate(-costheta*canvas.oImage.width,canvas.height);
+                } else {
+                    context.translate(0,-sintheta*canvas.oImage.width);
+                }
+                context.rotate(rotation);
+                context.drawImage(canvas.oImage, 0, 0, canvas.oImage.width, canvas.oImage.height);
+                context.restore();
+            }
+            canvas.id = p.id;
+            canvas.angle = p.angle;
+            p.parentNode.replaceChild(canvas, p);
+        }
+
+        jQuery.fn.rotateRight = function(angle) {
+            this.rotate(angle==undefined?90:angle);
+        }
+
+        jQuery.fn.rotateLeft = function(angle) {
+            this.rotate(angle==undefined?-90:-angle);
+        }
+
+    </script>
+    <script>
+        var w=0;
+        var h=0;
+        var deg=0;
+        $(function(){
+            init();
+            ldegChange("#rl");
+            rdegChange("#rr");
+        })
+        function init(){
+            var img = document.getElementById('Imgbox');
+            w=img.width;
+            h=img.height;
+        }
+
+        function rdegChange(buttonId){
+                   $(buttonId).bind("click",function(){
+                                deg=deg+90;
+                   })
+        }
+
+        function ldegChange(buttonId){
+            $(buttonId).bind("click",function(){
+                deg=deg-90;
+            })
+        }
+
+
+        var size=0;
+        function imgToSize(size) {
+            var img = $("#Imgbox");
+            var originWidth=img.width();
+            var originHeight=img.height();
+            img.width(originWidth + size);
+            img.height(originHeight + size/originWidth*originHeight);
+
+        }
+
+        function reset(){
+
+            var img = $("#Imgbox");
+            var originWidth= w;
+            var originHeight=h;;
+            img.width(originWidth);
+            img.height(originHeight) ;
+            img.rotate(-deg);
+            deg=0;
+        }
+
+        function toggleDiv(){
+            $("#imgwrapper").slideToggle();
+        }
+
+    </script>
+</head>
+<body>
+<div id="parent" onclick="toggleDiv()">点我查看图片</div>
+<div id="imgwrapper">
+    <div id='buttonwrapper'>
+        <button id="rr" onclick="$('#Imgbox').rotateRight(90)" >rotateRight</button>
+        <button id='rl' onclick="$('#Imgbox').rotateRight(-90);">rotateLeft</button>
+        <button onclick="imgToSize(25)">scaleBig</button>
+        <button onclick="imgToSize(-25);">scaleSmall</button>
+        <button onclick="reset()">resetImg</button>
+    </div>
+    <img id='Imgbox' src='http://www.google.com/intl/en_ALL/images/logo.gif'/>
+</div>
+<div id="searchContent">this is the search result content div</div>
+
+
+</body>
+</html>
