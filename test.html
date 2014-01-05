@@ -105,10 +105,16 @@
         var w=0;
         var h=0;
         var deg=0;
+        var i=0;
+        var NewW=0;
+        var NewH=0;
+
         $(function(){
             init();
             ldegChange("#rl");
             rdegChange("#rr");
+            sbChange("#sb");
+            ssChange("#ss");
         })
         function init(){
             var img = document.getElementById('Imgbox');
@@ -118,16 +124,57 @@
 
         function rdegChange(buttonId){
                    $(buttonId).bind("click",function(){
-                                deg=deg+90;
+                     //  imgToSize(25*i);
+                       deg=deg+90;
+                       var img = $("#Imgbox");
+                       if(NewH!==0&&NewW!==0){
+                           if((deg/90)%2==0){
+                               img.width(NewW);
+                               img.height(NewH);
+                           }
+                           else{
+                               img.width(NewH);
+                               img.height(NewW);
+                           }
+                      }
+
                    })
         }
 
         function ldegChange(buttonId){
             $(buttonId).bind("click",function(){
                 deg=deg-90;
+                var img = $("#Imgbox");
+                if(NewH!==0&&NewW!==0){
+                    if((deg/90)%2==0){
+                        img.width(NewW);
+                        img.height(NewH);
+                    }
+                    else{
+                        img.width(NewH);
+                        img.height(NewW);
+                    }
+                }
+
             })
         }
 
+        function sbChange(buttonId){
+
+            $(buttonId).bind("click",function(){
+
+                 i=i+1;
+
+            })
+
+        }
+        function ssChange(buttonId){
+
+            $(buttonId).bind("click",function(){
+               i=i-1;
+            })
+
+        }
 
         var size=0;
         function imgToSize(size) {
@@ -136,6 +183,14 @@
             var originHeight=img.height();
             img.width(originWidth + size);
             img.height(originHeight + size/originWidth*originHeight);
+            if((deg/90)%2==0){
+                NewW=img.width();
+                NewH=img.height();
+            }
+            else{
+                NewH=img.width();
+                NewW=img.height();
+            }
 
         }
 
@@ -143,9 +198,9 @@
 
             var img = $("#Imgbox");
             var originWidth= w;
-            var originHeight=h;;
+            var originHeight=h;
             img.width(originWidth);
-            img.height(originHeight) ;
+            img.height(originHeight);
             img.rotate(-deg);
             deg=0;
         }
@@ -162,8 +217,8 @@
     <div id='buttonwrapper'>
         <button id="rr" onclick="$('#Imgbox').rotateRight(90)" >rotateRight</button>
         <button id='rl' onclick="$('#Imgbox').rotateRight(-90);">rotateLeft</button>
-        <button onclick="imgToSize(25)">scaleBig</button>
-        <button onclick="imgToSize(-25);">scaleSmall</button>
+        <button id='sb' onclick="imgToSize(25)">scaleBig</button>
+        <button id='ss' onclick="imgToSize(-25);">scaleSmall</button>
         <button onclick="reset()">resetImg</button>
     </div>
     <img id='Imgbox' src='http://www.google.com/intl/en_ALL/images/logo.gif'/>
